@@ -24,7 +24,7 @@ with open(destFile, "w") as of:
               tempLine = oline
            else:
                of.write(oline)
-        elif oline[:5] == "G4 S0":
+        elif oline[:4] == "G4 S":
             of.write(oline)
             of.write(tempLine)
             tempLine = ""
