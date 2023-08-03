@@ -17,7 +17,7 @@ destFile = re.sub('\.gcode$','',sourceFile)
 destFile = destFile + '.gcode'
 
 with open(destFile, "w") as of:
-    for lIndex in xrange(len(lines)):
+    for lIndex in range(len(lines)):
         oline = lines[lIndex]
         if oline[:4] == "M104":
            if previousLine[:5] == "G1 E-":
