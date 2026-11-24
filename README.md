@@ -7,11 +7,21 @@ This script searches through GCODE files generate for the Prusa MMU and locates 
 
 **Background**
 
-The default operation in Prusa Slicer (as of version 2.0.0) performs the temperature change before any cooling moves take place. This causes issues as the hotend will heat up or cool down while the previous filament is still in the chamber. My fix for this is to edit the GCODE to request the temperature change after all cooling moves just before the current filament is extracted from the hot end. Ususally there is still plenty of time to get the hotend to the desired temperature (or very close) by the time the MMU loads the next filament to the hotend.
+PrusaSlicer (from 2.0.0 up to at least 2.9.7) performs the temperature change before any cooling moves take place. This causes issues as the hotend will heat up or cool down while the previous filament is still in the chamber. My fix for this is to edit the GCODE to request the temperature change after all cooling moves just before the current filament is extracted from the hot end. Ususally there is still plenty of time to get the hotend to the desired temperature (or very close) by the time the MMU loads the next filament to the hotend.
 
 **Details**
 
-The script look for any M104 commands that occur immediately after a retract (G1 E-.....). It then moves the M104 command to right after the G4 command that is the configured delay to wait before unloading (usually 0).
+The script works on each toolchange block, from the `; CP TOOLCHANGE UNLOAD` marker (or, for older GCODE without the marker, from an M104 that directly follows a retract `G1 E-...`) to the `T<n>` command. It moves every M104 of the block right after the last G4 command of the block, which is the configured delay to wait before unloading (usually 0). Blocks with no G4 after the M104 are left unchanged.
+
+PrusaSlicer 2.9.7 emits the M104 after a `G4 S0` that follows the ramming, not right after the retract, so the previous version of this script left the GCODE unchanged.
+
+**Usage**
+
+Python 3 is required. In PrusaSlicer, Print Settings > Output options > Post-processing scripts:
+```
+/usr/bin/env python3 /path/to/postprocess_mmutempchange.py;
+```
+The GCODE file is edited in place.
 
 Therefore this:
 ```
